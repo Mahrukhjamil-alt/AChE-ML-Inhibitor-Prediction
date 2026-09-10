@@ -38,6 +38,13 @@ The machine learning workflow included:
 | Threshold |   0.60 |
 
 The complete machine-learning workflow is provided in the Jupyter Notebook.
+### Protein Preparation
+
+* AChE structure (PDB ID: 4EY7) obtained from the Protein Data Bank.
+* Protein structure prepared and refined using **UCSF ChimeraX**.
+* Unwanted protein chain was removed.
+* Water molecules were handled during structure preparation.
+* The prepared protein was saved and used as the receptor for **PyRx molecular docking**.
 
 ## Molecular Docking
 
