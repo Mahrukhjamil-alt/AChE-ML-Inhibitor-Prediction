@@ -44,6 +44,20 @@ The complete machine-learning workflow is provided in the Jupyter Notebook.
 Molecular docking was performed using PyRx to evaluate the binding of selected compounds against the identified AChE binding pocket.
 
 The binding pocket was identified using CASTp.
+### Top 6 Docking Candidates
+
+Based on the best docking binding affinity, six compounds were selected for further interaction analysis:
+
+| Rank | Compound      | Best Binding Affinity (kcal/mol) |
+| ---- | ------------- | -------------------------------: |
+| 1    | CHEMBL4524111 |                             -8.9 |
+| 2    | CHEMBL205940  |                             -8.8 |
+| 3    | CHEMBL1677    |                             -8.7 |
+| 4    | CHEMBL609150  |                             -7.7 |
+| 5    | CHEMBL206093  |                             -7.6 |
+| 6    | CHEMBL207777  |                             -7.5 |
+
+These six compounds were subsequently evaluated for their interactions with the CASTp-identified binding pocket. Compounds that showed relatively low docking scores and/or insufficient interactions with the selected pocket residues were excluded. Two compounds were shortlisted for further ADMET evaluation, and CHEMBL206093 was selected as the final candidate based on the KCSM ADMET assessment.
 
 ### CASTp Pocket Residues
 
