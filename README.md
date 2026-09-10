@@ -47,14 +47,9 @@ Experimental compound activity data were obtained from **BindingDB**.
 
 ### Results
 
-**ROC Curve**
-![ROC Curve](roc_curve.png)
-
-**Precision-Recall Curve**
-![PR Curve](pr_curve.png)
-
-**Top 20 Morgan Fingerprint Features**
-![Feature Importance](feature_importance.png)
+![ROC Curve](figures/roc_curve.png)
+![PR Curve](figures/pr_curve.png)
+![Feature Importance](figures/feature_importance.png)
 
 Complete workflow: [`01_model_training.ipynb`](01_model_training.ipynb)
 
