@@ -1,8 +1,16 @@
-# AChE Inhibitor Prediction Using Machine Learning
+# AChE Inhibitor Prediction Using Machine Learning and Molecular Docking
 
 A computational drug-discovery pipeline for identifying potential inhibitors of human Acetylcholinesterase (AChE), combining **machine learning**, **molecular docking**, **protein–ligand interaction analysis**, and **ADMET profiling**.
 
-## Target
+---
+
+## Abstract
+
+This project presents an end-to-end computational workflow to prioritize potential AChE inhibitors for Alzheimer's disease therapy. A Random Forest classifier was trained on 6,870 compounds (1,510 active, 5,360 inactive) using Morgan fingerprints (radius 2, 2048 bits) with scaffold-based validation. The model achieved a ROC-AUC of 0.85 on the scaffold test set. Top predicted actives were docked against AChE (PDB: 4EY7) using PyRx, followed by 2D interaction analysis with BIOVIA Discovery Studio. The final lead candidate, CHEMBL206093, showed favorable docking score (−7.6 kcal/mol) and acceptable ADMET properties.
+
+---
+
+## 1. Target
 
 | Property | Value |
 |----------|-------|
@@ -11,7 +19,9 @@ A computational drug-discovery pipeline for identifying potential inhibitors of 
 | Therapeutic area | Alzheimer's disease |
 | Binding pocket | CASTp-identified pocket |
 
-## Machine Learning Pipeline
+---
+
+## 2. Machine Learning Pipeline
 
 Experimental compound activity data were obtained from **BindingDB**.
 
@@ -19,7 +29,7 @@ Experimental compound activity data were obtained from **BindingDB**.
 2. **Morgan fingerprints** (2048 bits, radius 2) via RDKit
 3. **Scaffold-based train/test split** (no scaffold leakage)
 4. **SMOTE** oversampling — applied to training data only
-5. **Random Forest** classification
+5. **Random Forest** classification with GridSearchCV tuning
 6. Threshold tuning using out-of-fold predictions
 
 ### Model Performance (Scaffold Test Set)
@@ -35,17 +45,30 @@ Experimental compound activity data were obtained from **BindingDB**.
 | PR-AUC | 0.6712 |
 | Decision threshold | 0.60 |
 
+### Results
+
+**ROC Curve**
+![ROC Curve](roc_curve.png)
+
+**Precision-Recall Curve**
+![PR Curve](pr_curve.png)
+
+**Top 20 Morgan Fingerprint Features**
+![Feature Importance](feature_importance.png)
+
 Complete workflow: [`01_model_training.ipynb`](01_model_training.ipynb)
 
-## Molecular Docking
+---
+
+## 3. Molecular Docking
 
 **Receptor preparation:**
-- AChE structure (PDB: 4EY7) from the Protein Data Bank
-- Prepared with **UCSF ChimeraX**
+- AChE structure (PDB: 4EY7) obtained from the Protein Data Bank
+- Structure prepared with **UCSF ChimeraX** (chain selection, water handling)
 - Binding pocket identified using **CASTp**
 
 **Docking:**
-- Software: **autodock vina in PyRx**
+- Software: **PyRx**
 - Results: [`AChE_docking_results.csv`](AChE_docking_results.csv)
 
 ### Top 6 Docking Candidates
@@ -59,18 +82,33 @@ Complete workflow: [`01_model_training.ipynb`](01_model_training.ipynb)
 | 5 | CHEMBL206093 | −7.6 |
 | 6 | CHEMBL207777 | −7.5 |
 
-**Pocket residues:** Glu81, Gly82, Met85, Asp131, Val132, Ala434, Thr436, Leu437, Ser438, Trp439, Tyr449, Glu452, Ile457, Arg463, Asn464, Tyr465.
+**Pocket residues analyzed:** Glu81, Gly82, Met85, Asp131, Val132, Ala434, Thr436, Leu437, Ser438, Trp439, Tyr449, Glu452, Ile457, Arg463, Asn464, Tyr465.
 
-Compounds with poor docking scores or insufficient pocket interactions were excluded. Two compounds were shortlisted for ADMET evaluation.
+---
 
-## Final Candidate
+## 4. Protein–Ligand Interaction Analysis
+
+2D protein–ligand interaction diagrams were generated using **BIOVIA Discovery Studio Visualizer** to evaluate:
+
+- Hydrogen bonding with catalytic residues
+- π–π stacking interactions
+- Hydrophobic contacts within the binding pocket
+
+Only the **top-ranked compound (CHEMBL206093)** was retained for final analysis based on its docking score, interaction profile, and subsequent ADMET evaluation.
+
+---
+
+## 5. Final Candidate
 
 | Property | Value |
 |----------|-------|
 | ChEMBL ID | CHEMBL206093 |
 | PubChem CID | [11681391](https://pubchem.ncbi.nlm.nih.gov/compound/11681391) |
+| Docking score | −7.6 kcal/mol |
 
-### ADMET Profile (pKCSM Predictions)
+---
+
+## 6. ADMET Profiling (KCSM Predictions)
 
 | Parameter | Prediction |
 |-----------|-----------|
@@ -88,14 +126,20 @@ Compounds with poor docking scores or insufficient pocket interactions were excl
 
 **Interpretation:** Favorable absorption (91.5%), not AMES-mutagenic, not a P-gp substrate. However, hERG II inhibition and hepatotoxicity flags require experimental validation. Multiple CYP450 inhibitions suggest possible drug–drug interaction risk.
 
-## Workflow
+---
+
+## 7. Workflow
+
+```
 BindingDB data → Preprocessing → Morgan fingerprints → Random Forest
 → Candidate screening → CASTp pocket identification → PyRx docking
-→ Interaction analysis → Shortlisting → KCSM ADMET → Final candidate
+→ Discovery Studio interaction analysis → Shortlisting → KCSM ADMET
+→ Final candidate (CHEMBL206093)
+```
 
-text
+---
 
-## Repository Contents
+## 8. Repository Contents
 
 | File | Description |
 |------|-------------|
@@ -103,12 +147,24 @@ text
 | `AChE_final_scaffold_results.csv` | Final model performance |
 | `AChE_docking_results.csv` | Molecular docking results |
 | `AChE_Final_RF_model.pkl.gz` | Trained Random Forest model (compressed) |
+| `predict.py` | Command-line prediction script |
+| `requirements.txt` | Python dependencies |
+| `roc_curve.png`, `pr_curve.png`, `feature_importance.png` | Model performance figures |
 
-## Usage
+---
 
-### Load the trained model and predict activity of any compound
+## 9. Usage
 
-The trained Random Forest model is saved in compressed form. You can load it and predict whether a new compound is **Active** or **Inactive** against AChE without re-training:
+### Option A — Python script (command line)
+
+```bash
+pip install -r requirements.txt
+python predict.py
+```
+
+Enter a SMILES string when prompted to get a prediction.
+
+### Option B — Python API
 
 ```python
 import gzip, joblib
@@ -116,46 +172,62 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import rdFingerprintGenerator
 
-# Step 1: Load the pre-trained Random Forest model
+# Load model
 with gzip.open("AChE_Final_RF_model.pkl.gz", "rb") as f:
     model = joblib.load(f)
 
-# Step 2: Generate Morgan fingerprint (must match training settings)
+# Generate Morgan fingerprint
 gen = rdFingerprintGenerator.GetMorganGenerator(radius=2, fpSize=2048)
-
-smiles = "CC(=O)Oc1ccccc1C(=O)O"   # aspirin — replace with any SMILES
+smiles = "CC(=O)Oc1ccccc1C(=O)O"   # aspirin example
 mol = Chem.MolFromSmiles(smiles)
 fp = np.array(gen.GetFingerprint(mol)).reshape(1, -1)
 
-# Step 3: Predict probability and apply tuned threshold (0.60)
+# Predict
 prob = model.predict_proba(fp)[0, 1]
 label = "Active" if prob >= 0.60 else "Inactive"
-
 print(f"SMILES: {smiles}")
 print(f"Predicted probability: {prob:.3f} → {label}")
-Install dependencies
-bash
-pip install pandas numpy scikit-learn xgboost imbalanced-learn rdkit matplotlib joblib
-#Limitations
-Recall = 0.60 — the model misses ~40% of true actives; suitable for prioritization, not exhaustive screening.
+```
 
-SMOTE on binary fingerprints can generate chemically unrealistic synthetic vectors.
+---
 
-Docking used a rigid-receptor protocol without formal redocking RMSD validation; results are preliminary.
+## 10. Limitations
 
-No experimental validation of the final candidate.
+- **Recall = 0.60** — the model misses ~40% of true actives; suitable for prioritization, not exhaustive screening.
+- **SMOTE on binary fingerprints** can generate chemically unrealistic synthetic vectors.
+- **Docking used a rigid-receptor protocol** without formal redocking RMSD validation; results are preliminary.
+- **No experimental validation** of the final candidate.
+- **ADMET predictions are from KCSM** — computational only, not experimental.
+- **Applicability domain** was not formally assessed.
 
-ADMET predictions are from KCSM — computational only.
+---
 
-Applicability domain was not formally assessed.
+## 11. Future Work
 
-#Data Sources
-Activity data: BindingDB
+- Ensemble models (RF + XGBoost + SVM stacking)
+- Deep learning approaches (GIN, ChemBERTa)
+- MD simulation and MM-GBSA for the top candidate
+- Experimental validation of CHEMBL206093
 
-Protein structure: PDB 4EY7
+---
 
-ADMET predictions: pKCSM
+## 12. Data Sources
 
-Author
-Mahrukh Jamil
-GitHub: @Mahrukhjamil-alt
+- **Activity data:** [BindingDB](https://www.bindingdb.org/)
+- **Protein structure:** [PDB 4EY7](https://www.rcsb.org/structure/4EY7)
+- **ADMET predictions:** [KCSM](https://myshkin.mit.edu/kcs/)
+
+---
+
+## 13. Author
+
+**Mahrukh Jamil**  
+BS Bioinformatics  
+University of Agriculture, Faisalabad
+GitHub: [@Mahrukhjamil-alt](https://github.com/Mahrukhjamil-alt)
+
+---
+
+## 14. License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
