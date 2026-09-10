@@ -89,6 +89,13 @@ Selected predictions included:
 | CYP3A4 inhibitor      |             Yes |
 
 These results are computational predictions and require experimental validation.
+**Interpretation:** The candidate shows favorable absorption (91.5% intestinal 
+absorption) and is not predicted to be AMES-mutagenic or a P-gp substrate — 
+positive early drug-likeness signals. However, it is flagged for hERG II 
+inhibition and hepatotoxicity, both common liabilities at this stage that 
+would need experimental validation before further development. Inhibition 
+of multiple CYP450 isoforms (1A2, 2C19, 2C9, 3A4) also suggests possible 
+drug-drug interaction risk, an important consideration for lead optimization.
 
 ## Workflow
 
