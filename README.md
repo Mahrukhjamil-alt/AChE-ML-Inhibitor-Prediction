@@ -197,8 +197,7 @@ print(f"Predicted probability: {prob:.3f} → {label}")
 - **SMOTE on binary fingerprints** can generate chemically unrealistic synthetic vectors.
 - **Docking used a rigid-receptor protocol** without formal redocking RMSD validation; results are preliminary.
 - **No experimental validation** of the final candidate.
-- **ADMET predictions are from KCSM** — computational only, not experimental.
-- **Applicability domain** was not formally assessed.
+- **ADMET predictions are from pKCSM** — computational only, not experimental.
 
 ---
 
@@ -215,7 +214,7 @@ print(f"Predicted probability: {prob:.3f} → {label}")
 
 - **Activity data:** [BindingDB](https://www.bindingdb.org/)
 - **Protein structure:** [PDB 4EY7](https://www.rcsb.org/structure/4EY7)
-- **ADMET predictions:** [KCSM](https://myshkin.mit.edu/kcs/)
+- **ADMET predictions:** [pKCSM](https://biosig.lab.uq.edu.au/pkcsm/)
 
 ---
 
